@@ -4,6 +4,9 @@
 ### 목차
 - [벡터](#벡터-생성-및-출력)
 - [행렬 생성 및 연산](#행렬-생성-및-연산)
+- [데이터프레임](#데이터프레임)
+- [Factor](#Factor)
+- [List](#List)
 --- 
 - ## 벡터
 ### 벡터 생성 및 출력
@@ -198,6 +201,11 @@ x[, 2]
 x[-2]
 # 출력: 1 3 4 5 6 7 8 9 10 11 12
 
+```
+### 행렬덧셈 실습하기 
+<img src="img/행렬덧셈.png">
+
+````r
 # 행렬 덧셈
 mat1 = matrix(1:9, nrow=3)
 mat2 = matrix(10:18, nrow=3)
@@ -208,4 +216,117 @@ mat3
 # [1,]   11   17   23
 # [2,]   13   19   25
 # [3,]   15   21   27
+````
+---
+- ## 데이터프레임
+> - #### 2차원 형태로 각 칼럼별로 다른 형태의 데이터를 가짐
+
+### 데이터프레임 생성 및 파생변수 추가
+
+```r
+# 데이터 프레임은 2차원 형태로 각 컬럼별로 다른 형태의 데이터를 가짐 (타입이 달라도 가능함)
+# 벡터 네 개 생성
+no = c(1,2,3,4)                            # 과일 번호
+name = c("Apple", "Banana", "Peach", "Berry") # 과일 이름
+prices = c(500,200,200,50)                 # 가격
+qty = c(5,2,7,9)                           # 수량
+
+# data.frame 이용해서 표로 만듬
+fruit = data.frame(NO = no, Name = name, Prices = prices, QTY = qty)
+fruit
+
+# 행 이름 만들기: 기본 지정된 1,2,3,4를 F1, F2, F3, F4로 수정
+rownames(fruit) = c("F1", "F2", "F3", "F4")
+fruit
+
+# 특정 행 추출
+fruit["F1", ]       # 행 이름 기준 추출
+fruit[1, ]          # 인덱스 기준 추출
+
+# 특정 컬럼 추출
+fruit$Name          # $는 리스트나 데이터프레임에서 특정 '이름이 있는 요소'를 꺼낼 때 쓰는 연산자
+fruit$QTY
+
+# 파생변수 생성: 가격 × 수량 = 총가격
+fruit$TotalPrice = fruit$Prices * fruit$QTY
+fruit
+```
+
+### 실습: 점수 데이터프레임 만들기
+
+<img src="img/행렬덧셈.png">
+
+```r
+name = c("철수", "영희", "순이", "영철")
+english = c(90, 80, 60, 70)
+math = c(50, 60, 100, 20)
+score = data.frame(Name = name, English = english, Math = math)
+score
+score$AVG = (score$English + score$Math) / 2
+score
+```
+
+### iris 데이터셋과 matrix 변환 실습
+
+```r
+dim(iris)                # 데이터의 차원을 알려줌 → 행(Row) 150개, 열(Column) 5개
+nrow(iris)               # 행 수
+ncol(iris)               # 열 수
+colnames(iris)           # 열 이름 반환
+class(iris)              # 클래스 확인
+str(iris)                # 구조 요약
+unique(iris[, 5])        # 5번째 열(Species) 중 중복 제거된 고유 값
+unique(iris$Species)     # 동일
+
+colSums(iris[, -5])      # 1~4열의 열별 합계 (Species 제외)
+colMeans(iris[, -5])     # 1~4열의 열별 평균
+rowSums(iris[, -5])      # 각 행별 합계
+rowMeans(iris[, -5])     # 각 행별 평균
+
+is.data.frame(iris)      # 데이터프레임인지 확인
+is.matrix(iris)          # 행렬인지 확인
+
+# 데이터프레임을 행렬로 변환 (수치형 열만)
+new_iris_mat = as.matrix(iris[, 1:4])
+new_iris_mat
+class(new_iris_mat)      # "matrix" "array"
+```
+---
+
+- ## Factor
+> - #### 문자형 데이터가 저장되는 벡터의 일종, 저장하는 값들이 어떤 종류를 나타낼 때 사용 (예: 성별, 혈액형)
+> - #### 이미 지정된 레벨(level) 이외의 값이 들어오는 것을 막을 수 있음
+
+```r
+f = c("A", "B", "B", "O", "AB", "A")
+
+# 문자형 벡터를 Factor로 변환
+f_factor = factor(f)
+f_factor                     # Levels: A AB B O
+levels(f_factor)             # 레벨 확인
+
+f[5]                         # 원래 문자 벡터의 5번째 값
+f_factor[5]                  # 팩터의 5번째 값 (level 기준 출력)
+f_factor[7]                  # 인덱스 범위 벗어나면 NA 출력
+
+f_factor[7] = "B"            # level에 있는 값 → 삽입 가능
+f_factor[8] = "C"            # level에 없는 값 → 경고 + NA
+
+as.integer(f_factor)         # factor 값을 level 번호로 변환
+```
+
+----
+
+- ## List
+> - #### (키, 값)의 형태로 데이터를 구성
+
+```r
+
+member = list(name = "Lee", address = "seoul", tel = "0108881111", ssn = 010815)
+member
+
+member$name                # 이름의 값 꺼내기
+member[1:3]                # 리스트의 앞 3개 요소 반환
+member$pay = 100           # 새 값 추가 (pay)
+member
 ```
