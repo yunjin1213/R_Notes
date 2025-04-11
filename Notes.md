@@ -7,7 +7,22 @@
 - [데이터프레임](#데이터프레임)
 - [Factor](#Factor)
 - [List](#List)
+- [데이터 저장 및 불러오기](#데이터의-저장-및-불러오기)
 --- 
+### 설치 할 패키지
+
+ ```r
+#tibble
+install.packages("tibble")   # tibble 사용 시
+library("tibble")
+#doBy package
+install.packages("doBy")
+library("doBy")
+#dplyr package
+install.packages("dplyr")
+library("dplyr")
+```
+
 - ## 벡터
 ### 벡터 생성 및 출력
 
@@ -328,4 +343,176 @@ member$name                # 이름의 값 꺼내기
 member[1:3]                # 리스트의 앞 3개 요소 반환
 member$pay = 100           # 새 값 추가 (pay)
 member
+```
+---
+
+- ## 데이터의 저장 및 불러오기
+
+```r
+
+# dataframe 생성
+no = c(1,2,3,4)
+name = c("Apple", "Banana", "Peach", "Berry")
+price = c(500,200,300,400)
+quantity = c(5,2,7,9)
+fruit = data.frame(N0 = no, Name = name, Price = price, Quantity = quantity)
+fruit
+
+# 저장하기 (getwd(), setwd()로 경로 지정해주기)
+save(fruit, file="test.dat")
+
+# 불러오기
+load("test.dat")
+fruit
+```
+
+### 엑셀 데이터 저장 및 불러오기
+
+```r
+# 불러오기
+score = read.csv("score.csv")
+score
+
+# 저장하기
+write.csv(fruit, "fruit.csv")
+```
+
+### 텍스트파일 저장 및 불러오기
+
+```r
+# txt 불러오기
+b = scan("birth.txt", what = "")  # 값만 읽어서 vector로 출력
+b
+
+c = read.table("birth.txt", header = T)  # 표 형태의 데이터를 읽어서 데이터프레임으로 출력
+c
+
+# 저장하기
+vec1 = c(1,2,3)
+vec2 = c(4,5,6)
+mat = rbind(vec1, vec2)
+mat
+save(mat, file="testmat.txt")
+
+dfile = load("testmat.txt")
+dfile
+mat
+```
+
+### URL로 데이터 읽기
+
+```r
+url = "https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv"
+myCASchools = read.csv(url)
+str(myCASchools)
+myCASchools
+
+# as_tibble 사용 시 보기 편하게 출력 (library(tibble) 필요)
+myTCASchools = as_tibble(myCASchools)
+myTCASchools
+```
+---
+
+- ## 데이터 조작, 처리 & 가공
+> - 벡터, 행렬, 데이터 프레임에 임의의 함수를 적용한 결과를 얻기 위한 함수
+> - 데이터 전체에 대해 함수를 한번에 적용하는 연산 수행을 통해 데이터 조작, 처리
+
+### [1] apply 계열 함수
+
+- apply(X, MARGIN, FUN)
+> - X: 배열
+> - MARGIN: 함수를 적용하는 방향(1: 행, 2: 열, c(1,2) 행, 열 모두)
+> - FUN: 적용할 함수
+
+```r
+head(iris)  # iris 데이터의 앞부분을 미리 확인
+
+# apply(X, MARGIN, FUN)
+apply(iris[,1:4], 2, sum)  # 모든 행의 1~4열 데이터에 대해 열 기준(2)으로 sum 적용
+
+# lapply(X, FUN) X: 배열, 리스트, 표현식
+x = list(a = 1:3, c = 4:6)
+lapply(x, mean)  # 리스트의 각 요소에 평균 함수(mean)를 적용
+
+# sapply(X, FUN) X: 배열, 리스트 | FUN: 적용할 함수
+sapply(iris[,1:4], mean)  # 데이터프레임의 각 열마다 평균을 구해 벡터로 반환
+x = sapply(iris[,1:4], mean)
+as.data.frame(x)  # 결과를 데이터프레임으로 변환
+
+# tapply(X, INDEX, FUN) X: 배열, 리스트, 표현식 | FUN: 적용할 함수
+tapply(iris$Sepal.Length, iris$Species, mean)  # Sepal.Length를 Species 기준으로 그룹화 후 평균 계산
+
+# mapply(FUN, ...)
+mapply(rnorm, c(1,2,3), c(0,10,100), c(1,1,1))  # rnorm을 여러 파라미터 조합으로 반복 적용
+```
+
+### [2] 데이터를 그룹으로 묶은 후 함수 호출
+
+```r
+summary(iris)  # 데이터 요약 정보 제공
+
+# summaryBy: 데이터프레임을 컬럼 값에 따라 그룹으로 묶은 후 요약 값 계산
+summaryBy(Sepal.Width + Sepal.Length ~ Species, iris)  # Species 기준으로 Sepal.Width와 Sepal.Length 평균, 합 등 요약
+
+# orderBy: 지정한 칼럼값에 따라 데이터 프레임을 정렬
+order(iris$Sepal.Width)  # Sepal.Width 기준 오름차순이 되기 위한 인덱스 정렬
+orderBy(~Sepal.Width, iris)  # Sepal.Width 기준으로 오름차순 정렬된 데이터프레임 반환
+
+# sampleBy: 데이터프레임을 컬럼 값에 따라 그룹으로 묶은 후 sample 추출
+sampleBy(~Species, frac=0.1, data=iris)  # Species별로 10%씩 샘플 추출
+
+# split: 주어진 조건에 따라 데이터를 분리한다
+split(iris, iris$Species)  # Species 기준으로 데이터프레임을 리스트로 분리
+
+# subset: 주어진 조건을 만족하는 조건을 선택한다
+subset(iris, Species == "setosa")  # setosa 종만 추출
+subset(iris, Sepal.Length > 5.0 & Sepal.Width > 4.0)  # 길이 > 5, 넓이 > 4인 행만 추출
+subset(iris, Sepal.Length > 5.0 & Sepal.Width > 4.0, select = c('Species'))  # 조건을 만족하는 행의 Species 열만 출력
+subset(iris, Sepal.Length > 5.0 & Sepal.Width > 4.0, select = c('Petal.Length', 'Petal.Width'))  # 특정 열만 선택 출력
+
+# merge: 데이터를 공통된 값에 기준해 병합
+x = data.frame(name=c("a","b","c"), math=c(1,2,3))
+y = data.frame(name=c("c","b","a"), english=c(4,5,6))
+merge(x, y)  # 공통 컬럼 name 기준으로 병합
+
+# with & within
+with(iris, {
+  print(mean(Sepal.Length))  # Sepal.Length 평균 출력
+  print(mean(Sepal.Width))   # Sepal.Width 평균 출력
+})
+
+x = data.frame(val = c(1,2,3,4,NA,5,NA))
+x = within(x, {
+  val = ifelse(is.na(val), median(val, na.rm=TRUE), val)  # NA 값이면 중앙값으로 대체
+})
+```
+
+### [3] attach & detach
+
+```r
+attach(iris)  # iris 데이터프레임의 컬럼을 직접 접근 가능하게 함
+head(Sepal.Width)  # Sepal.Width 바로 접근
+detach(iris)  # iris 해제
+head(Sepal.Width)  # 에러 발생 (iris 해제됨)
+```
+
+### [4] 기타
+
+```r
+# which
+which_test <- which(iris$Sepal.Length > 7)  # Sepal.Length > 7인 인덱스 반환
+iris[which_test, ]  # 해당 조건을 만족하는 행 추출
+
+# order
+x <- c(3,1,4,1,5,9,2)
+sorted_index <- order(x)  # 오름차순 인덱스 반환
+sorted_x <- x[sorted_index]  # 정렬된 벡터 생성
+sorted_x_desc <- x[order(x, decreasing = TRUE)]  # 내림차순 정렬
+
+# aggregate
+df <- data.frame(group = c("A","B","A","B","A","B"), value = c(10,20,15,25,12,30))
+agg_result <- aggregate(value ~ group, data = df, FUN = mean)  # 그룹별 평균
+agg_sum <- aggregate(value ~ group, data = df, FUN = sum)  # 그룹별 합계
+print(agg_result)
+print(agg_sum)
 ```
