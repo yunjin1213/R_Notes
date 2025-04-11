@@ -611,6 +611,7 @@ exam %>% mutate(
 - ## dplyr 실습 2
 <img src="img/testscore.png">
 
+
 ```r
 # url로 csv 열기
 url=("https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv")
