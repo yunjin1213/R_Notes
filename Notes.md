@@ -9,8 +9,8 @@
 - [List](#List)
 - [데이터 저장 및 불러오기](#데이터의-저장-및-불러오기)
 - [dplyr package](#dplyr-package)
-- [dplyr 실습 1](#dplyr-실습-1)
-- [dplyr 실습 2](#dplyr-실습-2)
+  - [dplyr 실습 1](#dplyr-실습-1)
+  - [dplyr 실습 2](#dplyr-실습-2)
 --- 
 ### 설치 할 패키지
 
