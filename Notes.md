@@ -8,6 +8,8 @@
 - [Factor](#Factor)
 - [List](#List)
 - [데이터 저장 및 불러오기](#데이터의-저장-및-불러오기)
+- [dplyr package](#dplyr-package)
+- [dplyr 실습](#dplyr-실습)
 --- 
 ### 설치 할 패키지
 
@@ -516,3 +518,114 @@ agg_sum <- aggregate(value ~ group, data = df, FUN = sum)  # 그룹별 합계
 print(agg_result)
 print(agg_sum)
 ```
+
+---
+
+- ## dplyr package
+> - #####  데이터 전처리: 분석에 적합하게 데이터를 가공하는 작업
+> - ##### 일부 추출, 종류별로 나누기, 여러 데이터 합치기 등의 작업 수행
+
+
+
+
+
+### 1. 조건에 맞는 데이터만 추출: filter
+- object_name %>% filter(조건식)
+```r
+exam %>% filter(class == 1)
+# → class가 1인 행만 추출됨
+```
+
+
+### 2. 조건에 맞는 변수만 추출: select
+- object_name %>% select
+```r
+exam %>% select(class, english)
+# → class와 english 컬럼만 추출됨
+```
+
+
+
+### 3. 정렬하기: arrange()
+
+
+```r
+# Math 성적에 따른 오름차순 정렬
+exam %>% arrange(math)
+
+# Math 성적에 따른 내림차순 정렬
+exam %>% arrange(class, desc(math))
+# → class를 기준으로 먼저 정렬하고, 같은 class 내에서는 math 점수 기준 내림차순 정렬
+```
+---
+- ## dplyr 실습 1
+<img src="img/R데이터셋%20분석.png">
+
+-  Q1. 각 county 별로 전체 인구 대비 아시아 인구 백분율을 구하고, 
+그 값이 Midwest 지역의 평균을 초과할 경우는 "large",
+그 외에는 "small"로 분류하여 "large"와 "small"에 해당하는 지역이 각각 얼마나 되는지 확인 하여라
+
+```r
+### 백분율 구하기
+midwest$ratio = midwest$popasian / midwest$poptotal
+x = mean(midwest$ratio)
+midwest$grade = ifelse(midwest$ratio >= x, "large", "small")
+table(midwest$grade)
+# → "large", "small" 개수 확인
+qplot(midwest$grade)
+# → 막대그래프 출력 (library(ggplot2) 필요)
+```
+
+
+- Q2. 아시아 인구 백분율이 가장 높은 상위 10개 county(지역)의 아시아 인구 백분율을 출력하시오.
+
+```r
+midwest_new = midwest %>%
+  arrange(desc(ratio)) %>%   # midwest$ratio 대신 ratio만 사용해도 동일
+  select(county, ratio) %>%
+  head(10)
+# → 상위 10개 지역의 county명과 백분율 확인
+```
+
+
+- Q3. 아시아 인구 백분율이 가장 높은 순으로 정렬하여 county와 아시아 인구 백분율을 asiapop.csv파일로 생성하시오.
+```r
+write.csv(midwest_new, "asiapop.csv")
+# → 현재 작업 폴더에 asiapop.csv 파일 저장됨
+```
+
+
+### 4. 파생변수 추가: mutate -> 여러 변수를 추가하거나 기존 변수를 변경할 수 있게 해줌
+
+```r
+exam = read.csv("exam.csv")
+exam %>% mutate(
+  total = math + english + science,                   # 총점 계산
+  mean = (math + english + science)/3,                # 평균 계산
+  test = ifelse(mean >= 60, "pass", "fail")           # 60점 이상이면 pass
+) %>% arrange(desc(total))                            # 총점 기준 내림차순 정렬
+# mutate() -> 변수 추가, arrange(desc(total))는 내림차순 정렬임
+```
+---
+- ## dplyr 실습 2
+<img src="img/testscore.png">
+
+```r
+# url로 csv 열기
+url=("https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv")
+myCASchools=read.csv(url)
+
+# 2. 각 학교의 read + math 평균 계산하여 새로운 변수 mymean 생성
+myCASchools$mymean <- (myCASchools$read + myCASchools$math) / 2
+
+# 3. 전체 평균 구하기, California 전체 학교의 평균 점수 평균값(CA_mean) 계산
+CA_mean <- mean(myCASchools$mymean)
+
+# 4. 평균보다 높은 상위 10개 학교의 위치(county), 이름(school), 학교 read + math test 평균을 알아내시오
+myCASchools %>% 
+  filter(mymean>CA_mean) %>% # 평균보다 높은 학교만 필터링
+  arrange(desc(mymean)) %>% # 평균 점수 기준으로 내림차순 정렬
+  select(county, school, mymean) %>% # 필요한 열만 추출
+  head(10) # 상위 10개 학교 출력
+```
+
