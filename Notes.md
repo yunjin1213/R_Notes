@@ -594,7 +594,7 @@ midwest_new = midwest %>%
 write.csv(midwest_new, "asiapop.csv")
 # → 현재 작업 폴더에 asiapop.csv 파일 저장됨
 ```
-
+---
 
 ### 4. 파생변수 추가: mutate -> 여러 변수를 추가하거나 기존 변수를 변경할 수 있게 해줌
 
