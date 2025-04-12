@@ -630,4 +630,47 @@ myCASchools %>%
   select(county, school, mymean) %>% # 필요한 열만 추출
   head(10) # 상위 10개 학교 출력
 ```
+---
+### 5. 집단별로 요약하기
+- group_by: 데이터를 그룹별로 나누기만 함, 평균, 합계 등을 계산하진 않음
+- summarise(): 그룹별 요약 통계를 계산함
+```r
+x = read.csv("exam.csv")
+
+# group으로만 묶기: 같은 group데이터가 보이지 않는 특별한 객체로 나누어짐
+x %>% group_by(class)
+
+# group로 묶고 반별 science 평균 점수를 계산해서 새로운 데이터 프레임 반환
+x %>% group_by(class) %>%
+summarise(mean = mean(science))
+```
+---
+
+- ## 데이터 가공 실습 1 
+> 반별로 수학 성적 요약하기: 평균, 합계, 중앙값, 학생 수
+
+```r
+x %>% group_by(class) %>%
+summarise(
+math_mean = mean(math),       # 평균 구하기
+math_total = sum(math),       # 합계 구하기
+math_median = median(math),   # 중앙값 구하기
+n = n()                       # 학생 수 구하기, n(): 현재 그룹의 행 개수 계산
+)
+```
+---
+
+- ## 데이터 가공 실습 2(California Test Score 분석)
+> - County별 학생수를 구하고, 학생수가 많은 county 5개를 알아내어라
+
+```r
+url = ("https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv")
+myCASchools = read.csv(url)
+myCASchools
+myCASchools %>% group_by(county) %>% # county로 그룹
+summarise(TS = sum(students)) %>% # 각 county마다 학생수를 더한 후 TS에 저장(dataframe에는 추가 X)
+arrange(desc(TS)) %>% # 학생수가 많은 순서로 내림차순 정렬(그룹들끼리비교하기)
+head(5) # 상위 5개 county만 보이도록
+```
+---
 
