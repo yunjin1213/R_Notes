@@ -648,29 +648,180 @@ summarise(mean = mean(science))
 
 - ## 데이터 가공 실습 1 
 > 반별로 수학 성적 요약하기: 평균, 합계, 중앙값, 학생 수
-
-```r
-x %>% group_by(class) %>%
-summarise(
-math_mean = mean(math),       # 평균 구하기
-math_total = sum(math),       # 합계 구하기
-math_median = median(math),   # 중앙값 구하기
-n = n()                       # 학생 수 구하기, n(): 현재 그룹의 행 개수 계산
-)
-```
+> ```r
+> x %>% group_by(class) %>%
+> summarise(
+> math_mean = mean(math),       # 평균 구하기
+> math_total = sum(math),       # 합계 구하기
+> math_median = median(math),   # 중앙값 구하기
+> n = n()                       # 학생 수 구하기, n(): 현재 그룹의 행 개수 계산
+> )
+>```
 ---
 
 - ## 데이터 가공 실습 2(California Test Score 분석)
 > - County별 학생수를 구하고, 학생수가 많은 county 5개를 알아내어라
+> ```r
+> url = ("https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv")
+> myCASchools = read.csv(url)
+> myCASchools
+> myCASchools %>% group_by(county) %>% # county로 그룹
+> summarise(TS = sum(students)) %>% # 각 county마다 학생수를 더한 후 TS에 저장(dataframe에는 추가 X)
+> arrange(desc(TS)) %>% # 학생수가 많은 순서로 내림차순 정렬(그룹들끼리비교하기)
+> head(5) # 상위 5개 county만 보이도록
+> ```
 
+> - County별 TPS(선생님 당 학생수)를 구하고, TPS가 큰 county 5개를 알아내어라
+> ```r
+> myCASchools %>% 
+>  group_by(county) %>% # county로 그룹 만들기
+>  summarise(TPS = (sum(students)/sum(teachers))) %>% # county - TPS로 새로운 값 생성
+>  arrange(desc(TPS)) %>% # TPS 내림차순으로 정렬하기
+>  head(5) #위에 5개 보여주기
+>```
+---
+### 6. 합치기
+- 가로로 합치기: left_join(data1, data2, by="기준변수명") -> 열이 늘어남
 ```r
-url = ("https://vincentarelbundock.github.io/Rdatasets/csv/AER/CASchools.csv")
-myCASchools = read.csv(url)
-myCASchools
-myCASchools %>% group_by(county) %>% # county로 그룹
-summarise(TS = sum(students)) %>% # 각 county마다 학생수를 더한 후 TS에 저장(dataframe에는 추가 X)
-arrange(desc(TS)) %>% # 학생수가 많은 순서로 내림차순 정렬(그룹들끼리비교하기)
-head(5) # 상위 5개 county만 보이도록
+test1 = data.frame(id = c(1,2,3,4,5), midterm = c(60,80,70,90,85))
+test2 = data.frame(id = c(1,2,3,4,5), final = c(70,83,65,95,80))
+total=left_join(test1,test2,by="id")
+total
 ```
 ---
+
+- ## 데이터 가공: 실습
+- 가로로 합치기: exam + 담임선생님
+
+```r
+name = data.frame(class=c(1,2,3,4,5), teacher=c("kim", "lee", "park", "choi", "jung"))
+exam_new = left_join(exam, name, by="class")
+exam_new
+# 세로로 합치기: bind_rows(data1, data2) -> 행이 늘어남(단, 변수명이 같아야 합칠 수 있음)
+group_a = data.frame(id=c(1,2,3,4,5), test=c(60,80,70,90,85))
+group_b = data.frame(id=c(6,7,8,9,10), test=c(70,83,65,95,80))
+group_all = bind_rows(group_a, group_b)
+group_all
+# 변수명이 다를때는 rename을 이용하여 변수명을 동일하게 맞춘 후 합쳐야 함
+# group_b = rename(group_b, id=id2) -> rename(데이터프레임, 새이름 = 기존이름)
+```
+---
+
+- ## 실습 2: MPG 데이터 분석
+> - Q1: class가 "suv"인 자동차와 "compact"인 자동차 중 어떤 자동차의 평균 도시연비(cty)가 더 높은지 알아보시오.
+>```r
+> df=mpg %>% select(class, cty) # class(차종), cty(도심연비) 열만 추출
+> df_suv = df %>% filter(class=="suv")  # class가 suv인 데이터만 추출
+> df_compact = df %>% filter(class == "compact") # class가 compact인 데이터만 추출
+> mean(df_suv$cty) # suv의 평균 도시 연비 계산
+> mean(df_compact$cty) # compact의 평균 도시 연비 계산
+> ```
+
+> - Q2: "audi"에서 생산한 자동차 중에서 고속도로연비(hwy)가 1~5위에 해당하는 자동차의 데이터를 출력하시오.
+> ```r
+> mpg %>%
+> filter(manufacturer=="audi") %>% # 제조사가 audi인 자동차만 필터링# 제조사가 audi인 자동차만 필터링
+> arrange(desc(hwy)) %>% # 고속도로 연비(hwy) 기준 내림차순 정렬
+> head(5) # 상위 5개 자동차 데이터 출력
+> ```
+
+> - Q3: 어떤회사에서 'compact'(경차) 차종을 가장 많이 생산하는지 분석하시오
+> ```r
+> mpg %>%
+> select(manufacturer, class) %>% # compact 차종만 필터링
+> group_by(manufacturer) %>% # 제조사별로 그룹화
+> summarise(num=n()) %>% # compact 차종 수를 계산
+> arrange(desc(num)) # 개수 기준으로 내림차순 정렬
+> ```
+
+> - Q4: 각 회사별(manufacturer)로 구동방식(drv: 4, f, r)에 따라 도시 연비가 어떻게 다른지 분석하시오
+> ```r
+> mpg %>%
+> group_by(manufacturer, drv) %>% # 제조사와 구동방식별로 그룹화
+> summarise(mean_cty=mean(cty)) %>% # 각 그룹별 평균 도시 연비 계산
+> head(10) # 상위 10개 결과 출력
+> ```
+---
+- ## 데이터 정제
+- 결측치 및 이상치 제거
+- 결측치: 누락된 값, 비어있는 값
+- R에서는 NA로 표시됨
+- R의 결측치 확인 함수: in.na()
+
+```r
+df=data.frame(gender=c("M", "F", NA, "M", "F"), score = c(5,4,3,4,NA))
+is.na(df)
+table(is.na(df)) # 카테고리형 데이터의 빈도수(개수)를 세주는 함수
+```
+---
+
+- ### (1) 결측치 정제 - 제거
+- 결측치가 있는 행만 추출하여 제거: filter
+- 여러변수에 동시에 결측치가 없는 데이터만 추출(결측치가 하나라도 있으면 제거): na.omit()
+
+```r
+table(is.na(df$gender)) # NA가 아닌 값 4개, NA인 값이 1개
+table(is.na(df$score)) # NA가 아닌값 4개, NA인 값이 1개
+mean(df$score) #결측값이 하나라도 있으면 NA 출력
+
+df_nomiss=df %>% filter(!is.na(score)) # NA가 있던 행 제거, score에 na 있는 행 제거, ! 붙여야 NA인 값이 FALSE로 출력
+df_nomiss
+mean(df_nomiss$score) # 4 출력
+df_nomiss = df %>% filter(!is.na(score)&!is.na(gender)) #!
+df_nomiss
+```
+
+- ### (1) 결측치 정제 - 제외
+- 함수의 결측치 제외 기능 이용하기: na.rm = T
+
+```r
+mean(df$score, na.rm=T) #결측치 제거하고 평균 산출
+sum(df$score, na.rm = T) #결측치 제거하고 합계 산출
+df %>% summarise(mean_score=(mean(score, na.rm = T))) # score의 결측치를 제거하고 평균값만 추출하기
+```
+---
+
+- ### (1) 결측치 정제 - 대체
+- 데이터가 작고 결측치가 많은 경우 사용
+- 결측치를 제거하는 대신 다른값을 채워넣는 방법
+- 평균, 최빈값으로 일괄 대체
+- 통계 분석 기법으로 각 결측치의 예측값을 추정해 대체
+
+```r
+df$score
+# 결측치를 평균값으로 대체
+df$score = ifelse(is.na(df$score), mean(df$score, na.rm = T), df$score)
+df$score
+```
+---
+
+- ### (2) 이상치 제거
+- 이상치(Outlier): 정상 범주에서 크게 벗어난 값
+- 제거순서 
+  - (1) 결측치(na)로 변환
+  - (2) 분석에서 제외
+
+```r
+outlier=data.frame(gender= c(1,2,1,3,2,1), score=c(5,4,3,4,2,600))
+outlier
+table(outlier$gender) # table: 값이 몇번 나왔는지 알 수 있음
+table(outlier$score)
+
+outlier$gender=ifelse(outlier$gender == 3, NA, outlier$gender)
+outlier$score=ifelse(outlier$score >5, NA, outlier$score)
+outlier
+mean(outlier$gender)
+mean(outlier$score)
+
+
+outlier %>% filter(!is.na(gender)&!is.na(score)) %>% #NA가 있는 행을 제거, NA가 아닌 값만 남김, & -> 둘다 NA가 아니어야 통과
+group_by(gender) %>% #gender를 기준으로 그룹 나눔
+summarise(mean_score=mean(score)) #값들을 평균 냄
+```
+
+- ## 데이터 정제
+> - tidyr package
+
+        
+            
 
