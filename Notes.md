@@ -1,22 +1,73 @@
-## R 벡터 실습 정리
+## R 정리
 
 ---
 ### 목차
-- [벡터](#벡터-생성-및-출력)
+
+- [벡터](#벡터)
+  - [벡터 생성 및 출력](#벡터-생성-및-출력)
+  - [기본 통계 및 정렬](#기본-통계-및-정렬)
+  - [벡터 조작](#벡터-조작)
+  - [벡터 연산](#벡터-연산)
+  - [집합 연산](#집합-연산)
+  - [반복과 고유값](#반복과-고유값)
+  - [문자열 결합](#문자열-결합)
+  - [논리 연산 및 확인](#논리-연산-및-확인)
 - [행렬 생성 및 연산](#행렬-생성-및-연산)
+  - [행렬덧셈 실습하기](#행렬덧셈-실습하기)
 - [데이터프레임](#데이터프레임)
-- [Factor](#Factor)
-- [List](#List)
-- [데이터 저장 및 불러오기](#데이터의-저장-및-불러오기)
+  - [데이터프레임 생성 및 파생변수 추가](#데이터프레임-생성-및-파생변수-추가)
+  - [iris 데이터셋과 matrix 변환 실습](#iris-데이터셋과-matrix-변환-실습)
+- [Factor](#factor)
+- [List](#list)
+- [데이터의 저장 및 불러오기](#데이터의-저장-및-불러오기)
+  - [엑셀 데이터 저장 및 불러오기](#엑셀-데이터-저장-및-불러오기)
+  - [텍스트파일 저장 및 불러오기](#텍스트파일-저장-및-불러오기)
+  - [URL로 데이터 읽기](#url로-데이터-읽기)
+- [데이터 조작, 처리 & 가공](#데이터-조작-처리--가공)
+  - [1. apply 계열 함수](#1-apply-계열-함수)
+  - [2. 데이터를 그룹으로 묶은 후 함수 호출](#2-데이터를-그룹으로-묶은-후-함수-호출)
+  - [3. attach & detach](#3-attach--detach)
+  - [4. 기타](#4-기타)
 - [dplyr package](#dplyr-package)
+  - [1. 조건에 맞는 데이터만 추출: filter](#1-조건에-맞는-데이터만-추출-filter)
+  - [2. 조건에 맞는 변수만 추출: select](#2-조건에-맞는-변수만-추출-select)
+  - [3. 정렬하기: arrange()](#3-정렬하기-arrange)
   - [dplyr 실습 1](#dplyr-실습-1)
+  - [4. 파생변수 추가: mutate](#4-파생변수-추가-mutate---여러-변수를-추가하거나-기존-변수를-변경할-수-있게-해줌)
   - [dplyr 실습 2](#dplyr-실습-2)
+  - [5. 집단별로 요약하기](#5-집단별로-요약하기)
+  - [데이터 가공 실습 1](#데이터-가공-실습-1)
+  - [데이터 가공 실습 2(California Test Score 분석)](#데이터-가공-실습-2california-test-score-분석)
+  - [6. 합치기](#6-합치기)
+  - [데이터 가공: 실습](#데이터-가공-실습)
+  - [실습 2: MPG 데이터 분석](#실습-2-mpg-데이터-분석)
+- [데이터 정제](#데이터-정제)
+  - [1. 결측치 정제 - 제거](#1-결측치-정제---제거)
+  - [1. 결측치 정제 - 제외](#1-결측치-정제---제외)
+  - [1. 결측치 정제 - 대체](#1-결측치-정제---대체)
+  - [2. 이상치 제거](#2-이상치-제거)
+- [데이터 정제(tidyr package)](#데이터-정제tidyr-package)
+- [Reshaping data in tidyr](#reshaping-data-in-tidyr)
+  - [gather](#gather)
+  - [spread](#spread)
+  - [Handling missing values in tidyr](#handling-missing-values-in-tidyr)
+    - [drop_na](#drop_nadata)
+    - [fill](#fill)
+    - [replace_na](#replace_na)
+  - [Expanding table in tidyr](#expanding-table-in-tidyr)
+    - [complete](#complete)
+    - [expand](#expand)
+  - [Splitting cells in tidyr](#splitting-cells-in-tidyr)
+    - [separate](#separate)
+    - [separate_rows](#separate_rows)
+  - [Unite](#uniting-cells-in-tidyr)
 --- 
+
 ### 설치 할 패키지
 
  ```r
 #tibble
-install.packages("tibble")   # tibble 사용 시
+install.packages("tibble")
 library("tibble")
 #doBy package
 install.packages("doBy")
@@ -24,7 +75,14 @@ library("doBy")
 #dplyr package
 install.packages("dplyr")
 library("dplyr")
+#tidyr package
+install.packages("tidyr")
+library("tidyr")
+#ggplot2
+install.packages("ggplot2")
+library("ggplot2")
 ```
+---
 
 - ## 벡터
 ### 벡터 생성 및 출력
@@ -220,7 +278,7 @@ x[-2]
 # 출력: 1 3 4 5 6 7 8 9 10 11 12
 
 ```
-### 행렬덧셈 실습하기 
+### 행렬덧셈 실습하기
 <img src="img/행렬덧셈.png">
 
 ````r
@@ -332,7 +390,7 @@ f_factor[8] = "C"            # level에 없는 값 → 경고 + NA
 as.integer(f_factor)         # factor 값을 level 번호로 변환
 ```
 
-----
+
 
 - ## List
 > - #### (키, 값)의 형태로 데이터를 구성
@@ -646,7 +704,7 @@ summarise(mean = mean(science))
 ```
 ---
 
-- ## 데이터 가공 실습 1 
+- ## 데이터 가공 실습 1
 > 반별로 수학 성적 요약하기: 평균, 합계, 중앙값, 학생 수
 > ```r
 > x %>% group_by(class) %>%
@@ -779,7 +837,7 @@ mean(df$score, na.rm=T) #결측치 제거하고 평균 산출
 sum(df$score, na.rm = T) #결측치 제거하고 합계 산출
 df %>% summarise(mean_score=(mean(score, na.rm = T))) # score의 결측치를 제거하고 평균값만 추출하기
 ```
----
+
 
 - ### (1) 결측치 정제 - 대체
 - 데이터가 작고 결측치가 많은 경우 사용
@@ -793,7 +851,6 @@ df$score
 df$score = ifelse(is.na(df$score), mean(df$score, na.rm = T), df$score)
 df$score
 ```
----
 
 - ### (2) 이상치 제거
 - 이상치(Outlier): 정상 범주에서 크게 벗어난 값
@@ -818,10 +875,283 @@ outlier %>% filter(!is.na(gender)&!is.na(score)) %>% #NA가 있는 행을 제거
 group_by(gender) %>% #gender를 기준으로 그룹 나눔
 summarise(mean_score=mean(score)) #값들을 평균 냄
 ```
+---
 
-- ## 데이터 정제
-> - tidyr package
+- ## 데이터 정제(tidyr package)
 
-        
-            
+> ### Tidy Data란?
+> - Tidy data는 분석하기 좋은 데이터 형태
 
+> <Tidy Data의 3가지 원칙>
+> - 각 변수(variable)는 열(column)
+> 
+> >예: 성별, 나이, 점수 → 각각 따로 열
+> - 각 관측값(observation, case)은 행(row)
+> 
+> >예: 한 사람의 성별/나이/점수 → 한 줄
+> 
+> 3. 각 셀(cell)은 하나의 값만 가짐
+> > 예: “남/20/80점”이 한 셀에 있으면 안 되고, “남”, “20”, “80”이 따로 있어야 tidy함
+---
+
+- ## Reshaping data in tidyr
+(change the layout of values in a table)
+
+- ## gather
+```r
+gather(data, key, value, ...): wide -> long변환
+# 여러개의 열을 두열(key,value, ...)로 모음 
+```
+
+<img src="img/Reshaping(gather).png" width="450">
+
+```r
+gather(table4a, '1999', '2000', key="year", value="cases")
+```
+- key = "year" → 열 이름(1999, 2000)을 이 year 열로 옮김
+- value = "cases" → 실제 값(0.7K, 2K 등)을 이 cases 열에 넣음
+
+- ## spread
+```r
+spread(data, key, value): long -> wide변환
+# key 열의 고유값을 새로운 열 이름으로 펼치고, value 열 값을 각 셀에 채워 넣음
+spread(data, key = "열로 펼칠 기준", value = "셀에 들어갈 값")
+```
+
+<img src="img/Reshaping(spread).png" width="450">
+
+```r
+spread(table2, type, count)
+```
+- type: type열의 값들(cases, pop)이 새로운 열 이름이 됨
+- count 값이 각각의 셀에 들어감
+---
+
+- ## Handling missing values in tidyr
+
+- ## drop_na(data)
+
+```r
+drop_na(data, ...): NA가 포함된 행 제거
+# 지정한 열에 NA가 있는 행을 삭제함
+```
+<img src="img/Handling(drop_na).png" width = "400">
+
+```r
+x = data.frame(x1 = c("A", "B", "C", "D", "E"), x2 = c(1, NA, NA, 3, NA))
+drop_na(x, x2)
+```
+- x2열에 NA가 있는 행은 모두 제거됨
+- 결과는 NA 없는 깔끔한 행만 남음
+
+- ## fill
+
+```r
+fill(data, ..., .direction = c("down", "up"))
+# NA를 바로 위(또는 아래)의 값으로 채움
+# 엑셀에서 '채우기' 기능과 유사
+```
+<img src="img/Handling(fill).png" width="400">
+
+```r
+fill(x,x2)
+```
+- x2열에서 NA가 있으면 이전 값으로 채워짐
+- 기본 방향은 "down" (위에서 아래)
+
+- ## replace_na
+
+```r
+replace_na(data, replace = list(col = value))
+# NA를 원하는 값으로 직접 대체함
+```
+<img src="img/Handling(replace_na).png" width="400">
+
+```r
+replace_na(x, list(x2 = 2))
+```
+- x2 열에서 모든 NA를 2로 대체
+- 열마다 다른 값 지정 가능(list 형태로 전달)
+---
+
+- ## Expanding table in tidyr
+- ## Complete
+
+```r
+complete(data, ..., fill = list())
+```
+- 기존 데이터에 빠진 조합을 채워서 모든 가능한 조합을 완성해줌
+- 실제 값이 없으면 NA로 채워짐 -> "데이터에 있어야 할 값인데 빠졌을 경우"에 유용
+
+```r
+df=tibble(
+        year = c(2010, 2010, 2010, 2010, 2012, 2012, 2012),
+        qtr = c(1,2,3,4,1,2,3),
+        revenue = c(10,20,30,40,NA,60,70)
+)
+df # 2011년도 없음, 2012의 4분기(qtr=4)도 없음
+df %>% complete(year=full_seq(year,1), qtr)
+```
+- year = full_seq(year,1) -> year를 1년 단위로 순서대로 채워라, 즉 2011을 만들라는 뜻
+- qtr -> 각 연도마다 qtr= 1~4를 전부 채움
+- 다음과 같은 표가 만들어짐
+
+  | year | qtr | revenue |
+  |------|-----|---------|
+  | 2010 | 1   | 10      |
+  | 2010 | 2   | 20      |
+  | 2010 | 3   | 30      |
+  | 2010 | 4   | 40      |
+  | 2011 | 1   | NA      |
+  | 2011 | 2   | NA      |
+  | 2011 | 3   | NA      |
+  | 2011 | 4   | NA      |
+  | 2012 | 1   | NA      |
+  | 2012 | 2   | 60      |
+  | 2012 | 3   | 70      |
+  | 2012 | 4   | NA      |
+
+
+- ## expand
+```r
+expand(data, ...)
+```
+- 주어진 변수들의 모든 가능한 조합을 생성함
+- 값을 채워지지 않고, NA가 생기는게 아닌 아예 값 없이 조합만 나옴
+
+```r
+df %>% expand(year = full_seq(year, 1), qtr)
+```
+- 행은 2010 ~ 2012, 열은 1~4까지 생성
+- 밑의 표처럼 가능한 모든 경우의 수의 표가 생성됨
+
+| year | qtr |
+  |------|-----|
+  | 2010 | 1   |
+  | 2010 | 2   |
+  | 2010 | 3   |
+  | 2010 | 4   |
+  | 2011 | 1   |
+  | 2011 | 2   |
+  | 2011 | 3   |
+  | 2011 | 4   |
+  | 2012 | 1   |
+  | 2012 | 2   |
+  | 2012 | 3   |
+  | 2012 | 4   |
+
+```r
+df <- tibble(
+        year = c(2010, 2010, 2012),
+        qtr = c(1, 2, 3),
+        revenue = c(10, NA, 30)
+)
+
+df %>% expand(year, qtr, revenue)
+```
+- 이 코드 실행 시 값의 목록은 다음과 같다
+  - year:2010, 2012
+  - qtr: 1,2,3
+  - revenue: 10, NA, 30
+즉, 2(year) * 3(qtr) * 3(revenue) = 18개 조합 생성
+
+- 다음과 같은 표가 그려짐
+
+| year | qtr | revenue |
+  |------|-----|---------|
+  | 2010 | 1   | 10      |
+  | 2010 | 1   | NA      |
+  | 2010 | 1   | 30      |
+  | 2010 | 2   | 10      |
+  | 2010 | 2   | NA      |
+  | 2010 | 2   | 30      |
+  | 2010 | 3   | 10      |
+  | 2010 | 3   | NA      |
+  | 2010 | 3   | 30      |
+  | 2012 | 1   | 10      |
+  | 2012 | 1   | NA      |
+  | 2012 | 1   | 30      |
+  | 2012 | 2   | 10      |
+  | 2012 | 2   | NA      |
+  | 2012 | 2   | 30      |
+  | 2012 | 3   | 10      |
+  | 2012 | 3   | NA      |
+  | 2012 | 3   | 30      |
+
+---
+
+- ## Splitting cells in tidyr
+
+- ## separate
+```r
+separate(data, col, into, sep = "/", remove = TRUE, convert = FALSE, extra="warn", fill="warn", ...)
+# 하나의 셀 값을 구분자로 나눠서 여러 열로 나눔
+```
+- 한셀에 "값1/값2" 형태로 들어있는 데이터를 두 열로 나누고 싶을 때 사용
+
+<img src="img/Splitting%20cells%20in%20tidyr(separate).png">
+
+```r
+separate(table3, rate, into = c("cases", "pop"), sep = "/")
+```
+- rate 열의 0.7K/19M 같은 값을 -> "cases" = 0.7K, "pop" = 19M 으로 나눔
+
+- ## separate_rows()
+```r
+separate_rows(data, col, sep = "/")
+# 한 셀에 들어있는 여러 값을 아아행으로 나눠줌
+```
+- "값1/값2" 처럼 하나의 셀에 여러 개의 값이 있을 때 한 행을 여러행으로 늘려서 각각의 값을 따로 표현
+
+<img src="img/Splitting%20cells%20in%20tidyr(separate_rows).png">
+
+```r
+separate_rows(table3, rate, sep = "/")
+```
+- "0.7K/19M" -> 한 행이 아닌 두 행: 하나는 "0.7K", 하나는 "19M" 으로 나눠줌
+
+- separate(), separate_rows() 비교 요약
+
+  | 함수              | 결과 형태 | 사용 목적                          |
+  |-------------------|------------|-------------------------------------|
+  | `separate()`       | 열 분리     | 셀 안의 값을 **여러 열로 나눔**        |
+  | `separate_rows()`  | 행 분리     | 셀 안의 값을 **여러 행으로 나눔**        |
+
+---
+- ## Uniting cells in tidyr
+```r
+unite(data, col, ..., sep = "_", remove = TRUE)
+# 여러 열을 하나의 열로 합침
+col: 인자이름이 아닌, 위치인자(parameter position), 즉 새로 만들 열 이름이 들어와야 한다라는 뜻
+```
+- 여러 열의 값을 하나로 합쳐서 -> 한 열로 병합
+
+<img src="img/Uniting%20cells%20in%20tidyr(unite).png">
+
+```r
+unite(table5, year, century, year, sep = "")
+```
+
+- century와 year 열을 합쳐서 새로운 "year" 열을 만듦
+- sep = "" -> 공백 없이 그대로 붙이기 (19 + 99 -> 1999)
+- 공백 넣고 싶으면 sep = " " 사용하기
+
+
+- unite 문법 잡고 가기
+```r
+unite(table5, century, year, col="year", sep="")
+```
+해도 year이라는 새로운 열로 century, year가 합쳐짐, col = "year"을 지정해주었기 때문처럼 보이지만...
+
+**사실은 R이 col = "year"를 문자열로 내부 처리했을 뿐, 공식 문법은 아님**
+
+
+정확한 문법은 
+
+```r
+unite(data, col, ..., sep = "",)
+```
+이 된다. col: 새로운 열, 그다음 합칠 열, 간격.. 이런식으로 써야 함
+```r
+unite(data, 새로운 열, 합칠 열1, 합칠 열2, ... 간격)
+```
