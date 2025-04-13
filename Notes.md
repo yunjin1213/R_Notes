@@ -1,5 +1,15 @@
 ## R 정리
 
+
+##### 시험전 이거 깔고가기
+```r
+install.packages("readr")    # read_csv() 사용하려면 필요
+install.packages("dplyr")    # 데이터 처리
+install.packages("lubridate") # 날짜 처리 (있으면 편함)
+# 인코딩 깨질 때
+myData = read_csv("파일이름.csv", locale = locale(encoding = "euc-kr"))
+```
+
 ---
 ### 목차
 
@@ -1155,3 +1165,45 @@ unite(data, col, ..., sep = "",)
 ```r
 unite(data, 새로운 열, 합칠 열1, 합칠 열2, ... 간격)
 ```
+
+## 과제
+- ### 과제 1
+> <img src="img/Quiz1.jpeg" width=250>
+>
+> 1. 다음과 같은 데이터 프레임 burger를 생성하시오
+> ```r
+> brand <- c("M", "L", "B")
+> menu <- c("빅맥", "불고기버거", "치즈와퍼")
+> kcal <- c(514, 533, 566)
+> na <- c(917, 817, 920)
+> fat <- c(15, 13, 12)
+> 
+> burger <- data.frame(
+> 브랜드 = brand,
+> 메뉴명 = menu,
+> 열량 = kcal,
+> 나트륨 = na,
+> 포화지방 = fat
+> )
+> 
+> rownames(burger) = c("M","L","B")
+> colnames(burger) <- c("브랜드(brand)", "메뉴명(Menu)", "열량(Kcal)", "나트륨(Na)", "포화지방(Fat)")
+> ```
+> 2. 다음 질문에 답하는 코드를 작성하시오.
+> 
+> > (1) M사의 나트륨 함량은?
+>> ```r
+>> burger[1,4]
+>> ```
+>
+>> (2) 모든 브랜드의 열량 정보는?
+>>  ```r
+>> burger[,3]
+>> ```
+>> (3) M과 B사의 menu명은?
+>> ```r
+>> burger[burger$`브랜드(brand)` %in% c("M", "B"), '메뉴명(Menu)']
+>> burger[c('M','B'), '메뉴명(Menu)'] #M, B 행, '메뉴명(Menu)'열 추출
+>>```
+
+- ### 과제 2
