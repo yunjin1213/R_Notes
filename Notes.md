@@ -139,6 +139,7 @@ length(v4)              # 출력: 20  (length는 벡터의 길이, 즉 원소의
 ```r
 x <- c(1,4,6,8,9)
 x[2]                    # 출력: 4  (인덱스 2의 원소를 반환함)
+x[c(2,4)]               # 인덱스 여러개 뽑을 땐 c()로 묶어줘야 함
 x[-2]                   # 출력: 1 6 8 9  (인덱스 2의 원소를 제외한 나머지 원소를 반환함)
 x[2 < x & x < 5]        # 출력: 4  (조건을 만족하는 원소를 반환함)
 replace(x, c(2,4), c(32,24))  # 출력: 1 32 6 24 9  (지정된 인덱스의 원소를 새로운 값으로 교체함)
@@ -163,7 +164,7 @@ x == y                  # 출력: FALSE FALSE TRUE  (각 원소 비교 결과를
 union(x, y)             # 출력: 1 2 3 5 6  (중복 제거한 x와 y의 합집합을 반환함)
 intersect(x, y)         # 출력: 3  (x와 y의 교집합을 반환함)
 setdiff(x, y)           # 출력: 1 2  (x에서 y에 없는 원소를 반환함)
-setequal(x, y)          # 출력: FALSE  (x와 y가 동일한 원소를 가지는지 확인함)
+setequal(x, y)          # 출력: FALSE  (x와 y가 동일한 원소를 가지는지 확인함) 순서 상관 x, 원소만 같으면 true
 is.element(3, x)        # 출력: TRUE  (3이 x 벡터의 원소인지 확인함)
 ```
 
@@ -598,7 +599,7 @@ print(agg_sum)
 
 
 
-### 1. 조건에 맞는 데이터만 추출: filter
+### 1. 조건에 맞는 데이터만 추출: filter (행만 뽑는다)
 - object_name %>% filter(조건식)
 ```r
 exam %>% filter(class == 1)
@@ -606,7 +607,7 @@ exam %>% filter(class == 1)
 ```
 
 
-### 2. 조건에 맞는 변수만 추출: select
+### 2. 조건에 맞는 변수만 추출: select (열만 뽑는다)
 - object_name %>% select
 ```r
 exam %>% select(class, english)
